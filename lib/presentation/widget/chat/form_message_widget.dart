@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class FormMessageWidget extends StatelessWidget {
-  const FormMessageWidget({super.key});
+  final ValueChanged<String> valueOn;
+
+  const FormMessageWidget({super.key, required this.valueOn});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +21,7 @@ class FormMessageWidget extends StatelessWidget {
         hintText: 'Enviar mensaje',
         suffixIcon: IconButton(
             onPressed: () {
-              print('Enviar ${textController.text}');
+              valueOn(textController.text);
               textController.clear();
             },
             icon: const Icon(Icons.send)));
@@ -34,6 +36,7 @@ class FormMessageWidget extends StatelessWidget {
       onFieldSubmitted: (value) {
         textController.clear();
         focusNode.requestFocus();
+        valueOn(value);
       },
     );
   }

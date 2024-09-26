@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/domain/entities/message.dart';
 import 'package:myapp/presentation/widget/chat/form_message_widget.dart';
 import 'package:myapp/presentation/widget/chat/her_messages_widget.dart';
 import 'package:myapp/presentation/widget/chat/my_message_widget.dart';
+import 'package:myapp/providers/chat_provider.dart';
+import 'package:provider/provider.dart';
 
 class ChatScreen extends StatelessWidget {
   const ChatScreen({super.key});
@@ -18,10 +21,13 @@ class ChatScreen extends StatelessWidget {
           title: const Text("Chat Bot"),
           centerTitle: false,
         ),
-        body: const Column(
+        body: Column(
           children: [
-            Expanded(child: _ChatView()),
-            FormMessageWidget(),
+            const Expanded(child: _ChatView()),
+            FormMessageWidget(valueOn: (String value) { 
+              final chatProvider = context.read<ChatProvider>();
+              chatProvider.sendMessage(value);
+             },),
           ],
         ));
   }
@@ -32,16 +38,22 @@ class _ChatView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final chatprovider = context.watch<ChatProvider>();
+
     return SafeArea(
         child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       child: ListView.builder(
         itemBuilder: (context, index) {
-          return (index % 2 == 0
-              ? const MyMessageBuuble()
-              : const HerMessagesBuuble());
+          final message = chatprovider.messagesList[index];
+
+          return (
+            message.chatUser == ChatUser.bot
+                ? const HerMessagesBuuble()
+                : MyMessageBuuble( message: message)
+          );
         },
-        itemCount: 2,
+        itemCount: chatprovider.messagesList.length,
       ),
     ));
   }
